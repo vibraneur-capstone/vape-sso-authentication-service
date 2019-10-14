@@ -4,7 +4,7 @@ info:
   title: V.A.P.E S.S.O
   version: 0.0.1 snapshot
 host: localhost:8821
-basePath: /sso
+basePath: /sso/v1
 schemes:
   - http
   - https
@@ -95,10 +95,8 @@ definitions:
     properties:
       sessionId:
         type: string
-        readOnly: true
       secrete:
         type: string
-        readOnly: true
   SessionRequest:
     type: object
     properties:

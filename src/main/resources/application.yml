@@ -1,4 +1,4 @@
 server:
   port : 8821
   servlet:
-    context-path: /${spring.application.name}
+    context-path: /${spring.application.name}/v1

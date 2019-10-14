@@ -2,10 +2,12 @@ package com.vape.sso;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@EnableAuthorizationServer
+@ComponentScan(
+        basePackages = {"com.vape", "com.vape.sso"}
+)
 public class SsoApplication {
 
     public static void main(String[] args) {

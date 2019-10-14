@@ -1,9 +1,11 @@
 package com.vape.sso.controller;
 
+import com.vape.sso.service.SessionService;
 import com.vape.sso.swagger.model.SessionRequest;
 import com.vape.sso.swagger.model.SessionResponse;
 import com.vape.sso.swagger.model.SessionState;
 import com.vape.sso.swagger.model.SessionStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,10 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/session")
 public class SessionController {
+
+    @Autowired
+    private SessionService sessionService;
+
     @RequestMapping(
             method={RequestMethod.GET},
             value = {"/{sessionId}/secret/{secret}"},
@@ -34,10 +40,6 @@ public class SessionController {
     )
     @ResponseStatus(HttpStatus.OK)
     public SessionResponse activateSession(@RequestBody @Valid SessionRequest request) {
-        //TODO remove this mock and implement real shit
-        SessionResponse mock = new SessionResponse();
-        mock.setSecrete("this is a mock secret");
-        mock.setSessionId("this is a mock id");
-        return mock;
+        return sessionService.activateNewSession(request);
     }
 }

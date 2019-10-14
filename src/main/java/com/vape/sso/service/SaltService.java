@@ -11,8 +11,6 @@ public class SaltService {
     private CredentialSaltRepository credentialSaltRepository;
 
     String getSalt(String associateId) {
-        String a = credentialSaltRepository.findCredentialSaltsByAssociateId(associateId).getSalt();
-        System.out.println(a);
-        return a;
+        return credentialSaltRepository.findCredentialSaltsByAssociateId(associateId).getSalt();
     }
 }

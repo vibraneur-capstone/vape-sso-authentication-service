@@ -2,3 +2,9 @@ server:
   port : 8821
   servlet:
     context-path: /${spring.application.name}/v1
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27017/sso?socketTimeoutMS=1500&connectTimeoutMS=5000
+      database: sso

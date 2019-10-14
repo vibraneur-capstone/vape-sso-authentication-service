@@ -1,19 +1,22 @@
 package com.vape.sso.model;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Builder
 @Setter(AccessLevel.NONE)
-@Document(collection="liveSessions")
-public class Session {
+@Document(collection="audit")
+public class AuditSessionModel {
     @Id
-    private String sessionId;
+    private String auditId;
     private String jwt;
     private String userId;
     private String userAgent;
-    private String createdAt;
-    private String expiresAt;
+    private String sessionStartDate;
+    private String sessionEndDate;
 }

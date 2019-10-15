@@ -17,12 +17,21 @@ public class UserService {
     private SaltService credentialSaltService;
 
     /**
+     * retrieve a single user
+     * @param user user
+     * @return UserModel
+     */
+    UserModel getUser(String user) {
+        return userRepository.findUsersByClientId(user);
+    }
+
+    /**
      * Validate session request by comparing user credential
      * @param request SessionRequest
      * @return boolean
      */
     boolean validateSessionRequest(SessionRequest request){
-        UserModel user = userRepository.findUsersByUser(request.getUser());
+        UserModel user = userRepository.findUsersByClientId(request.getClientId());
         return user != null && computeHash(user, request).equals(user.getHashedPwd());
     }
 
@@ -33,8 +42,8 @@ public class UserService {
      * @return String
      */
     private String computeHash(UserModel user, SessionRequest request) {
-        String id = DigestUtils.sha256Hex(String.format("%s%s", user.getId(), user.getUser()));
-        String salt = credentialSaltService.getSalt(id);
-        return salt == null ? "" : DigestUtils.sha256Hex(String.format("%s%s", salt, request.getPwd()));
+        String id = DigestUtils.sha256Hex(String.format("%s%s", user.getId(), user.getClientId()));
+        String salt = credentialSaltService.getSaltByAssociateId(id);
+        return salt == null ? "" : DigestUtils.sha256Hex(String.format("%s%s", salt, request.getClientSecret()));
     }
 }

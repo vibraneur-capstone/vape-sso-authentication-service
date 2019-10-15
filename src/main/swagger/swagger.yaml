@@ -100,9 +100,11 @@ definitions:
   SessionRequest:
     type: object
     properties:
-      user:
+      client-id:
         type: string
-      pwd:
+      client-secret:
+        type: string
+      user-agent:
         type: string
   SessionState:
     type: object

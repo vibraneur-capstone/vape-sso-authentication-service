@@ -1,44 +1,61 @@
 package com.vape.sso.service;
 
+import com.vape.sso.config.JwtConfig;
+import com.vape.sso.model.JwtPayloadModel;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.*;
 import javax.xml.bind.DatatypeConverter;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtService {
-    public String createJWT(String id, String issuer, String subject, long ttlMillis) {
 
-        //The JWT signature algorithm we will be using to sign the token
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    @Autowired
+    private JwtConfig jwtConfig;
+
+    String createJWT(JwtPayloadModel payload, String subject) {
+
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.valueOf(jwtConfig.getSignatureAlgorithm());
 
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
 
-        //We will sign our JWT with our ApiKey secret
-        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary("SECRET_KEY");
+        // create signing key
+        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(jwtConfig.getSecretKey());
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-
-        //Let's set the JWT Claims
+        //build JWT content
         JwtBuilder builder = Jwts.builder()
-                .setId(id)
+                .setId(generateId(payload.toString(), subject))
                 .setIssuedAt(now)
                 .setSubject(subject)
-                .setIssuer(issuer)
+                .setIssuer(jwtConfig.getIssuer())
+                .claim("full-name", payload.getFullName())
+                .claim("client-id", payload.getUser())
+                .claim("user-agent", payload.getUserAgent())
+                .claim("user-roles", payload.getUserRoles())
                 .signWith(signatureAlgorithm, signingKey);
 
-        //if it has been specified, let's add the expiration
-        if (ttlMillis >= 0) {
-            long expMillis = nowMillis + ttlMillis;
+        //Add expiration
+        if (jwtConfig.getMaxAge() >= 0) {
+            long expMillis = nowMillis + jwtConfig.getMaxAge();
             Date exp = new Date(expMillis);
             builder.setExpiration(exp);
         }
 
         //Builds the JWT and serializes it to a compact, URL-safe string
         return builder.compact();
+    }
+
+    private String generateId(String payload, String subject) {
+        return DigestUtils.sha256Hex(String.format("%s%s", payload, subject));
     }
 
 }

@@ -10,7 +10,7 @@ public class SaltService {
     @Autowired
     private CredentialSaltRepository credentialSaltRepository;
 
-    String getSalt(String associateId) {
+    String getSaltByAssociateId(String associateId) {
         return credentialSaltRepository.findCredentialSaltsByAssociateId(associateId).getSalt();
     }
 }

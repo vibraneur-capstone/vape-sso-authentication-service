@@ -15,8 +15,7 @@ public class SessionModel {
     @Id
     private String sessionId;
     private String jwt;
-    private String userName;
+    private String user;
     private String userAgent;
-    private LocalDate createdDate;
     private LocalTime createdTime;
 }

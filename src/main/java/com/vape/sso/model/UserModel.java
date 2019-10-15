@@ -5,6 +5,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Data
 @Builder
 @Setter(AccessLevel.NONE)
@@ -12,7 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserModel {
     @Id
     private String id;
-    private String user;
+    private String clientId;
+    private String fullName;
     private String hashedPwd;
-    private UserRole userRole;
+    private List<UserRole> userRole;
 }

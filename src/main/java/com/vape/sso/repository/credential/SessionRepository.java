@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 public interface SessionRepository extends MongoRepository<SessionModel, String> {
-    @Query("{ 'userName': ?0 }")
-    SessionModel findSessionModelByUserName(String userName);
+    @Query("{ 'user': ?0 }")
+    SessionModel findSessionModelByUser(String userName);
 }

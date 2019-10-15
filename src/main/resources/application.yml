@@ -8,3 +8,12 @@ spring:
     mongodb:
       uri: mongodb://127.0.0.1:27017/sso?socketTimeoutMS=1500&connectTimeoutMS=5000
       database: sso
+
+com:
+  vape:
+    sso:
+      jwt:
+        issuer: vibraneur-sso-service
+        signature-algorithm: HS256
+        max-age: 1000000
+        secret-key: CC4BBA2415B838D58193ADE9E492B

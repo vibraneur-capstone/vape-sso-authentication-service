@@ -1,6 +1,8 @@
 package com.vape.sso.service;
 
+import com.vape.sso.model.JwtPayloadModel;
 import com.vape.sso.model.SessionModel;
+import com.vape.sso.model.UserModel;
 import com.vape.sso.repository.credential.SessionRepository;
 import com.vape.sso.swagger.model.SessionRequest;
 import com.vape.sso.swagger.model.SessionResponse;
@@ -35,10 +37,27 @@ public class SessionService {
     }
 
     private SessionModel activate(SessionRequest request) {
-        SessionModel existing = sessionRepository.findSessionModelByUserName(request.getUser());
+        SessionModel existing = sessionRepository.findSessionModelByUser(request.getClientId());
+        UserModel user = userService.getUser(request.getClientId());
+        JwtPayloadModel payload = generatePayload(user, request);
         return existing == null
-                ? sessionRepository.save(generateNewSession(request))
-                : sessionRepository.save(updateExistingSession(existing));
+                ? sessionRepository.save(generateNewSession(request, payload))
+                : sessionRepository.save(updateExistingSession(existing, payload));
+    }
+
+    /**
+     * generate jwt payload content
+     * @param user UserModel
+     * @param sessionRequest SessionRequest
+     * @return JwtPayloadModel
+     */
+    private JwtPayloadModel generatePayload(UserModel user, SessionRequest sessionRequest) {
+        return JwtPayloadModel.builder()
+                .fullName(user.getFullName())
+                .user(user.getClientId())
+                .userRoles(user.getUserRole().toString())
+                .userAgent(sessionRequest.getUserAgent())
+                .build();
     }
 
     /**
@@ -47,13 +66,13 @@ public class SessionService {
      * @param session SessionModel
      * @return SessionModel
      */
-    private SessionModel updateExistingSession(SessionModel session) {
+    private SessionModel updateExistingSession(SessionModel session, JwtPayloadModel payload) {
         return SessionModel.builder()
                 .sessionId(session.getSessionId())
-                .createdDate(session.getCreatedDate())
+                .userAgent(session.getUserAgent())
                 .createdTime(session.getCreatedTime())
-                .jwt(jwtService.createJWT("test id update", "test issuer update", "test subject update", 100000))
-                .userName(session.getUserName())
+                .jwt(jwtService.createJWT(payload, "EXTEND"))
+                .user(session.getUser())
                 .build();
     }
 
@@ -63,12 +82,12 @@ public class SessionService {
      * @param request SessionRequest
      * @return SessionModel
      */
-    private SessionModel generateNewSession(SessionRequest request) {
+    private SessionModel generateNewSession(SessionRequest request, JwtPayloadModel payload) {
         return SessionModel.builder()
-                .createdDate(LocalDate.now())
+                .userAgent(request.getUserAgent())
                 .createdTime(LocalTime.now())
-                .jwt(jwtService.createJWT("test id", "test issuer", "test subject", 100000))
-                .userName(request.getUser())
+                .jwt(jwtService.createJWT(payload, "NEW"))
+                .user(request.getClientId())
                 .build();
     }
 

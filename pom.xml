@@ -95,7 +95,7 @@
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>${find-bugs-version}</version>
                 <configuration>
-                    <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
+                    <excludeFilterFile>findbugs_filter.xml</excludeFilterFile>
                     <findbugsXmlOutput>true</findbugsXmlOutput>
                     <xmlOutput>true</xmlOutput>
                     <effort>Max</effort>

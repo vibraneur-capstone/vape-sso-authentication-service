@@ -1,5 +1,5 @@
 <FindBugsFilter>
     <Match>
-        <Package name="~com\.vape\.sso\.swagger\..*"/>
+        <Package name="com.vape.sso.swagger.model"/>
     </Match>
 </FindBugsFilter>

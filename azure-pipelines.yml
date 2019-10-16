@@ -9,7 +9,7 @@ trigger:
     - '*'
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'macOS-10.14'
 
 steps:
 # - task: Maven@3

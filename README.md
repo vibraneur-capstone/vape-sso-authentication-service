@@ -9,6 +9,15 @@
 # Swagger
 Copy and paste to swagger editor for easier view and edit. [here](http://editor.swagger.io])
 
+
+# JWT
+
+SSO is enabled by JSON Web Token (JWT), which this service generates for end users      
+
+Decode JWT [here](https://jwt.io)       
+And use the `secret-key` found in application.yml
+
+
 # TODO
 1. Add Junify unit test
 2. Add PMD plugin

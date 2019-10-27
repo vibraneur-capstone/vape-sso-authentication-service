@@ -51,7 +51,7 @@ paths:
           schema:
             $ref: '#/definitions/Exception'
 
-  '/session/activate':
+  '/session':
     post:
       tags:
         - Activate new session

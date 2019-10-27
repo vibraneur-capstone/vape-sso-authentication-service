@@ -34,12 +34,13 @@ public class SessionController {
 
     @RequestMapping(
             method={RequestMethod.POST},
-            value = {"/activate"},
+            value = "",
             consumes = {"application/json"},
             produces = {"application/json"}
     )
     @ResponseStatus(HttpStatus.OK)
     public SessionResponse activateSession(@RequestBody @Valid SessionRequest request) {
+        //TODO : set cookie in header
         return sessionService.activateNewSession(request);
     }
 }

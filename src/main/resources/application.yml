@@ -6,7 +6,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://127.0.0.1:27017/sso?socketTimeoutMS=1500&connectTimeoutMS=5000
+      uri: mongodb+srv://admin:admin@vape-sso-t9uut.mongodb.net/test?retryWrites=true&w=majority
       database: sso
 
 com:

@@ -117,18 +117,22 @@
                         <goals>
                             <goal>generate</goal>
                         </goals>
+
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/swagger/swagger.yaml</inputSpec>
+                            <output>${basedir}/target/generated-sources</output>
+                            <language>spring</language>
+                            <modelPackage>com.vape.sso.swagger.v1.model</modelPackage>
+                            <apiPackage>com.vape.sso.swagger.v1.api</apiPackage>
+                            <generateSupportingFiles>false</generateSupportingFiles>
                             <configOptions>
                                 <sourceFolder>swagger</sourceFolder>
-                                <modelPackage>com.vape.sso.swagger.model</modelPackage>
+                                <interfaceOnly>true</interfaceOnly>
+                                <library>spring-boot</library>
                                 <dateLibrary>java8</dateLibrary>
+                                <configPackage>com.vape.sso.swagger.v1.config</configPackage>
+                                <singleContentTypes>true</singleContentTypes>
                             </configOptions>
-                            <output>${project.build.directory}/generated-sources</output>
-                            <language>java</language>
-                            <library>jersey2</library>
-                            <generateApis>false</generateApis>
-                            <generateSupportingFiles>false</generateSupportingFiles>
                         </configuration>
                     </execution>
                 </executions>

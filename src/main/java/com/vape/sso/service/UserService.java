@@ -2,7 +2,7 @@ package com.vape.sso.service;
 
 import com.vape.sso.model.UserModel;
 import com.vape.sso.repository.credential.UserRepository;
-import com.vape.sso.swagger.model.SessionRequest;
+import com.vape.sso.swagger.v1.model.SessionRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

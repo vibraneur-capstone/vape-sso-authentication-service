@@ -22,21 +22,7 @@ public class SessionController implements SessionApi {
 
     @Autowired
     private SessionService sessionService;
-//
-//    @Override
-//    public ResponseEntity<SessionState> checkSession(String sessionId, String secret) {
-//        // TODO implement this
-//        return null;
-//    }
 
-//    @Override
-//    @RequestMapping(value = "/{clientId}",
-//            produces = "application/json",
-//            consumes = "",
-//            method = RequestMethod.GET)
-//    public ResponseEntity<SessionResponse> getNewSession(@PathVariable(value="clientId", required = true) String sessionId, SessionRequest credential) {
-//        return new ResponseEntity<SessionResponse>(sessionService.activateNewSession(credential), HttpStatus.OK);
-//    }
     @RequestMapping(
             method={RequestMethod.GET},
             value = {"/session/{sessionId}/token"},

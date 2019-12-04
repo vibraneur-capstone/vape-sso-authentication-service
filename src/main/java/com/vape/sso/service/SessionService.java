@@ -37,7 +37,7 @@ public class SessionService {
 
     private SessionModel activate(SessionRequest request) {
         SessionModel existing = sessionRepository.findSessionModelByUser(request.getClientId());
-        UserModel user = userService.getUser(request.getClientId());
+        UserModel user = userService.getUserById(request.getClientId());
         JwtPayloadModel payload = generatePayload(user, request);
         return existing == null
                 ? sessionRepository.save(generateNewSession(request, payload))

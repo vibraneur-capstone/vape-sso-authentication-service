@@ -18,11 +18,11 @@ public class UserService {
 
     /**
      * retrieve a single user
-     * @param user user
+     * @param id user
      * @return UserModel
      */
-    UserModel getUser(String user) {
-        return userRepository.findUsersByClientId(user);
+    UserModel getUserById(String id) {
+        return userRepository.findUsersByClientId(id);
     }
 
     /**

@@ -5,8 +5,6 @@ import com.vape.sso.swagger.v1.api.SessionApi;
 import com.vape.sso.swagger.v1.model.SessionRequest;
 import com.vape.sso.swagger.v1.model.SessionResponse;
 import com.vape.sso.swagger.v1.model.SessionState;
-import com.vape.sso.type.SessionStatus;
-import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +30,7 @@ public class SessionController implements SessionApi {
     public ResponseEntity<SessionState> checkSession(@PathVariable(value="sessionId", required = true) String sessionId,
                                                      @NotNull @Valid @RequestParam(value = "secret", required = true) String secret){
         //TODO remove this mock and implement real shit
-        SessionState mock = new SessionState();
+//        SessionState mock = new SessionState();
 //        mock.setStatus(SessionStatus.ACTIVE.to);
         return null;
     }

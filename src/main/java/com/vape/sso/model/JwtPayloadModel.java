@@ -2,13 +2,10 @@ package com.vape.sso.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vape.sso.type.UserRole;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
-
-import java.util.List;
 
 @Data
 @Builder

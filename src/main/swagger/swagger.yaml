@@ -9,7 +9,7 @@ schemes:
   - http
   - https
 paths:
-  '/session/{sessionId}/token?secret={secret}':
+  '/session/client':
     get:
       tags:
         - Check if session is active
@@ -19,16 +19,16 @@ paths:
         - application/json
 
       parameters:
-        - in: path
+        - in: query
           name: sessionId
           required: true
           type: string
           description: The id of session to check
         - in: query
-          name: secret
+          name: token
           required: true
           type: string
-          description: The secret of session to check
+          description: The token of session to check
 
       responses:
         '200':
@@ -63,7 +63,7 @@ paths:
         - application/json
       parameters:
         - in: path
-          name: sessionId
+          name: clientId
           required: true
           type: string
           description: The id of session to check

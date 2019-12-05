@@ -21,32 +21,30 @@ public class SessionController implements SessionApi {
     @Autowired
     private SessionService sessionService;
 
-    @RequestMapping(
-            method={RequestMethod.GET},
-            value = {"/session/{sessionId}/token"},
-            produces = {"application/json"}
-    )
+    @Override
+    @RequestMapping(value = {"/session/client"},
+            produces = {"application/json"},
+            method = {RequestMethod.GET})
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<SessionState> checkSession(@PathVariable(value="sessionId", required = true) String sessionId,
-                                                     @NotNull @Valid @RequestParam(value = "secret", required = true) String secret){
+    public ResponseEntity<SessionState> checkSession(@NotNull @Valid @RequestParam(value = "sessionId") String sessionId,
+                                                     @NotNull @Valid @RequestParam(value = "token") String token) {
+
         //TODO remove this mock and implement real shit
 //        SessionState mock = new SessionState();
 //        mock.setStatus(SessionStatus.ACTIVE.to);
         return null;
     }
 
-    @RequestMapping(
-            method={RequestMethod.POST},
-            value = "/session/clientId/{clientId}",
+    @Override
+    @RequestMapping(value = {"/session/clientId/{clientId}"},
+            produces = {"application/json"},
             consumes = {"application/json"},
-            produces = {"application/json"}
-    )
+            method = {RequestMethod.POST})
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<SessionResponse> getNewSession(@PathVariable(value="clientId", required = true) String sessionId,
-                                                         @RequestBody @Valid SessionRequest request) {
-        if(StringUtils.isEmpty(sessionId) || !sessionId.equals(request.getClientId())){
+    public ResponseEntity<SessionResponse> getNewSession(@PathVariable("clientId") String clientId, @Valid @RequestBody SessionRequest credential) {
+        if (StringUtils.isEmpty(clientId) || !clientId.equals(credential.getClientId())) {
             return new ResponseEntity<>(new SessionResponse().sessionId("").secrete(""), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(sessionService.activateNewSession(request), HttpStatus.OK);
+        return new ResponseEntity<>(sessionService.activateNewSession(credential), HttpStatus.OK);
     }
 }

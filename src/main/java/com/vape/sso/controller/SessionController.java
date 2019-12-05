@@ -22,7 +22,8 @@ public class SessionController implements SessionApi {
     private SessionService sessionService;
 
     @Override
-    @RequestMapping(value = {"/session/client"},
+    @RequestMapping(
+            value = {"/session/client"},
             produces = {"application/json"},
             method = {RequestMethod.GET})
     @ResponseStatus(HttpStatus.OK)
@@ -36,12 +37,14 @@ public class SessionController implements SessionApi {
     }
 
     @Override
-    @RequestMapping(value = {"/session/clientId/{clientId}"},
+    @RequestMapping(
+            value = {"/session/clientId/{clientId}"},
             produces = {"application/json"},
             consumes = {"application/json"},
             method = {RequestMethod.POST})
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<SessionResponse> getNewSession(@PathVariable("clientId") String clientId, @Valid @RequestBody SessionRequest credential) {
+    public ResponseEntity<SessionResponse> getNewSession(@PathVariable("clientId") String clientId,
+                                                         @Valid @RequestBody SessionRequest credential) {
         if (StringUtils.isEmpty(clientId) || !clientId.equals(credential.getClientId())) {
             return new ResponseEntity<>(new SessionResponse().sessionId("").secrete(""), HttpStatus.BAD_REQUEST);
         }

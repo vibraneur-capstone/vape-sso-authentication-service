@@ -25,6 +25,11 @@ steps:
     jdkArchitectureOption: 'x64'
     publishJUnitResults: false
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    sonarQubeRunAnalysis: false
+    # will be run by mvn install
+    checkStyleRunAnalysis: false
+    pmdRunAnalysis: false
+    findBugsRunAnalysis: false
     goals: 'package'
 
 - script: |

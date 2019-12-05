@@ -23,13 +23,13 @@ steps:
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
+    publishJUnitResults: false
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
 
 - script: |
     npm install -g swagger-cli@2.3.4
-    swagger-cli validate swagger.yaml
+    swagger-cli validate ./src/main/swagger/swagger.yaml
   displayName: 'Swagger file validation'
 
 - script: |

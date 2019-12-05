@@ -12,6 +12,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
@@ -22,6 +26,11 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+
+- script: |
+    npm install -g swagger-cli@2.3.4
+    swagger-cli validate swagger.yaml
+  displayName: 'Swagger file validation'
 
 - script: |
     mvn clean install

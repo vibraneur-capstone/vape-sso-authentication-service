@@ -34,7 +34,7 @@ steps:
 
 - script: |
     npm install -g swagger-cli@2.3.4
-    swagger-cli validate ./src/main/swagger/swagger.yaml
+    swagger-cli validate ./src/main/resources/swagger.yaml
   displayName: 'Swagger file validation'
 
 - script: |

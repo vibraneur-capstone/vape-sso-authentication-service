@@ -14,7 +14,7 @@ paths:
       tags:
         - Check if session is active
       summary: check if a session is alive
-      operationId: checkSession
+      operationId: getSession
       produces:
         - application/json
 
@@ -51,11 +51,11 @@ paths:
           schema:
             $ref: '#/definitions/Exception'
 
-  '/session/clientId/{clientId}':
+  '/session/client/{clientId}':
     post:
       tags:
         - Activate new session
-      operationId: GetNewSession
+      operationId: PostNewSession
       summary: Activate new session
       consumes:
         - application/json

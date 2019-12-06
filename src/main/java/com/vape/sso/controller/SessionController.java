@@ -11,9 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 @RestController
 @RequestMapping("/")
 public class SessionController implements SessionApi {
@@ -22,14 +19,7 @@ public class SessionController implements SessionApi {
     private SessionService sessionService;
 
     @Override
-    @RequestMapping(
-            value = {"/session/client"},
-            produces = {"application/json"},
-            method = {RequestMethod.GET})
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<SessionState> checkSession(@NotNull @Valid @RequestParam(value = "sessionId") String sessionId,
-                                                     @NotNull @Valid @RequestParam(value = "token") String token) {
-
+    public ResponseEntity<SessionState> getSession(String sessionId, String token) {
         //TODO remove this mock and implement real shit
 //        SessionState mock = new SessionState();
 //        mock.setStatus(SessionStatus.ACTIVE.to);
@@ -37,16 +27,9 @@ public class SessionController implements SessionApi {
     }
 
     @Override
-    @RequestMapping(
-            value = {"/session/clientId/{clientId}"},
-            produces = {"application/json"},
-            consumes = {"application/json"},
-            method = {RequestMethod.POST})
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<SessionResponse> getNewSession(@PathVariable("clientId") String clientId,
-                                                         @Valid @RequestBody SessionRequest credential) {
+    public ResponseEntity<SessionResponse> postNewSession(String clientId, SessionRequest credential) {
         if (StringUtils.isEmpty(clientId) || !clientId.equals(credential.getClientId())) {
-            return new ResponseEntity<>(new SessionResponse().sessionId("").secrete(""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new SessionResponse(), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(sessionService.activateNewSession(credential), HttpStatus.OK);
     }

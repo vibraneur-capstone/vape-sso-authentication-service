@@ -21,7 +21,7 @@
         <jackson-version>2.9.10</jackson-version>
         <find-bugs-version>3.0.4</find-bugs-version>
         <junit-jupiter-version>5.3.2</junit-jupiter-version>
-        <swagger-codegen-maven-plugin.version>2.3.1</swagger-codegen-maven-plugin.version>
+        <swagger-codegen-maven-plugin-version>2.4.10</swagger-codegen-maven-plugin-version>
         <maven-pmd-plugin-version>3.9.0</maven-pmd-plugin-version>
         <pmd.failOnViolation>true</pmd.failOnViolation>
     </properties>
@@ -47,6 +47,14 @@
             <artifactId>swagger-annotations</artifactId>
             <version>${swagger-annotations.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-codegen-maven-plugin -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-codegen-maven-plugin</artifactId>
+            <version>${swagger-codegen-maven-plugin-version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.codehaus.mojo</groupId>
@@ -181,7 +189,7 @@
             <plugin>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>${swagger-codegen-maven-plugin.version}</version>
+                <version>${swagger-codegen-maven-plugin-version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -189,19 +197,22 @@
                         </goals>
 
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/swagger/swagger.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/swagger.yaml</inputSpec>
                             <output>${basedir}/target/generated-sources</output>
                             <language>spring</language>
+                            <library>spring-boot</library>
                             <modelPackage>com.vape.sso.swagger.v1.model</modelPackage>
                             <apiPackage>com.vape.sso.swagger.v1.api</apiPackage>
                             <generateSupportingFiles>false</generateSupportingFiles>
                             <configOptions>
                                 <sourceFolder>swagger</sourceFolder>
                                 <interfaceOnly>true</interfaceOnly>
-                                <library>spring-boot</library>
                                 <dateLibrary>java8</dateLibrary>
+                                <java8>true</java8>
                                 <configPackage>com.vape.sso.swagger.v1.config</configPackage>
                                 <singleContentTypes>true</singleContentTypes>
+                                <useBeanValidation>true</useBeanValidation>
+                                <delegatePattern>true</delegatePattern>
                             </configOptions>
                         </configuration>
                     </execution>

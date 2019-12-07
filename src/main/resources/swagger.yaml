@@ -9,26 +9,26 @@ schemes:
   - http
   - https
 paths:
-  '/session/{sessionId}/secret/{secret}':
+  '/session/client':
     get:
       tags:
         - Check if session is active
       summary: check if a session is alive
-      operationId: checkSession
+      operationId: getSession
       produces:
         - application/json
 
       parameters:
-        - in: path
+        - in: query
           name: sessionId
           required: true
           type: string
           description: The id of session to check
-        - in: path
-          name: secret
+        - in: query
+          name: token
           required: true
           type: string
-          description: The secret of session to check
+          description: The token of session to check
 
       responses:
         '200':
@@ -41,7 +41,7 @@ paths:
         '400':
           description: Bad Request
           schema:
-            $ref: '#/definitions/Exception'
+            $ref: '#/definitions/BadRequestException'
         '404':
           description: Not Found
           schema:
@@ -51,17 +51,22 @@ paths:
           schema:
             $ref: '#/definitions/Exception'
 
-  '/session':
+  '/session/client/{clientId}':
     post:
       tags:
         - Activate new session
-      operationId: ActivateNewSession
+      operationId: PostNewSession
       summary: Activate new session
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
+        - in: path
+          name: clientId
+          required: true
+          type: string
+          description: The id of session to check
         - in: body
           name: Credential
           required: true
@@ -79,7 +84,7 @@ paths:
         '400':
           description: Bad Request
           schema:
-            $ref: '#/definitions/Exception'
+            $ref: '#/definitions/BadRequestException'
         '404':
           description: Not Found
           schema:
@@ -117,12 +122,26 @@ definitions:
       - EXPIRED
       - INVALID
       - ACTIVE
+  BadRequestException:
+    type: object
+    properties:
+      message:
+        type: integer
+      errorCode:
+        type: string
+        readOnly: false
+    required:
+      - message
+      - errorCode
   Exception:
     type: object
     properties:
       message:
-        type: string
-        readOnly: true
+        type: integer
       errorCode:
         type: string
-        readOnly: true
+        readOnly: false
+    required:
+      - message
+      - errorCode
+

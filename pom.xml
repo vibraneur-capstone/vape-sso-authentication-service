@@ -16,11 +16,14 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <swagger-annotations-version>1.5.21</swagger-annotations-version>
+        <swagger-annotations.version>1.5.21</swagger-annotations.version>
         <lombok-version>1.18.10</lombok-version>
         <jackson-version>2.9.10</jackson-version>
         <find-bugs-version>3.0.4</find-bugs-version>
-        <swagger-codegen-maven-plugin-version>2.3.1</swagger-codegen-maven-plugin-version>
+        <junit-jupiter-version>5.3.2</junit-jupiter-version>
+        <swagger-codegen-maven-plugin-version>2.4.10</swagger-codegen-maven-plugin-version>
+        <maven-pmd-plugin-version>3.9.0</maven-pmd-plugin-version>
+        <pmd.failOnViolation>true</pmd.failOnViolation>
     </properties>
 
     <dependencies>
@@ -40,16 +43,18 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>${swagger-annotations-version}</version>
+            <version>${swagger-annotations.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-codegen-maven-plugin -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-codegen-maven-plugin</artifactId>
+            <version>${swagger-codegen-maven-plugin-version}</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.codehaus.mojo</groupId>
@@ -81,15 +86,87 @@
             <version>2.9.10.1</version>
         </dependency>
 
+        <!-- unit test -->
+        <!-- exclude junit 4 -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- junit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter-version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
 
     </dependencies>
 
+    <distributionManagement>
+
+    </distributionManagement>
+
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer-plugin.version}</version>
+                    <configuration>
+                        <rules>
+                            <reactorModuleConvergence>
+                                <message>The reactor is not valid</message>
+                                <ignoreModuleDependencies>true</ignoreModuleDependencies>
+                            </reactorModuleConvergence>
+                            <requireReleaseDeps>
+                                <message>Snapshots dependencies are NOT Allowed!</message>
+                                <onlyWhenRelease>true</onlyWhenRelease>
+                                <failWhenParentIsSnapshot>true</failWhenParentIsSnapshot>
+                            </requireReleaseDeps>
+                            <requireReleaseVersion>
+                                <message>Snapshot version are NOT Allowed!!!!!</message>
+                            </requireReleaseVersion>
+                        </rules>
+                        <fail>true</fail>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!--sure fire-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.0</version>
+            </plugin>
+            <!--find bugs-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
@@ -108,6 +185,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- swagger codegen -->
             <plugin>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
@@ -117,20 +195,104 @@
                         <goals>
                             <goal>generate</goal>
                         </goals>
+
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/swagger/swagger.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/swagger.yaml</inputSpec>
+                            <output>${basedir}/target/generated-sources</output>
+                            <language>spring</language>
+                            <library>spring-boot</library>
+                            <modelPackage>com.vape.sso.swagger.v1.model</modelPackage>
+                            <apiPackage>com.vape.sso.swagger.v1.api</apiPackage>
+                            <generateSupportingFiles>false</generateSupportingFiles>
                             <configOptions>
                                 <sourceFolder>swagger</sourceFolder>
-                                <modelPackage>com.vape.sso.swagger.model</modelPackage>
+                                <interfaceOnly>true</interfaceOnly>
                                 <dateLibrary>java8</dateLibrary>
+                                <java8>true</java8>
+                                <configPackage>com.vape.sso.swagger.v1.config</configPackage>
+                                <singleContentTypes>true</singleContentTypes>
+                                <useBeanValidation>true</useBeanValidation>
+                                <delegatePattern>true</delegatePattern>
                             </configOptions>
-                            <output>${project.build.directory}/generated-sources</output>
-                            <language>java</language>
-                            <library>jersey2</library>
-                            <generateApis>false</generateApis>
-                            <generateSupportingFiles>false</generateSupportingFiles>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
+            <!-- pmd -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${maven-pmd-plugin-version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/com/vape/sso/swagger/v1/model/*.java</exclude>
+                        <exclude>**/com/vape/sso/swagger/v1/api/*.java</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>cpd-check</goal>
+                        </goals>
+                        <configuration>
+                            <failOnViolation>${pmd.failOnViolation}</failOnViolation>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- jacoco -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.2</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/com/vape/sso/swagger/**</exclude>
+                        <exclude>**/model/**</exclude>
+                        <exclude>**/config/**</exclude>
+                        <exclude>**/type/**</exclude>
+                        <exclude>SsoApplication.java</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${jacoco.ut.execution.data.file}</destFile>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.54</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.50</minimum>
+                                        </limit>
+                                    </limits>
+                                    <excludes>
+                                    </excludes>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
         </plugins>

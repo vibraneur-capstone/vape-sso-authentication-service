@@ -4,12 +4,11 @@ import com.vape.sso.model.JwtPayloadModel;
 import com.vape.sso.model.SessionModel;
 import com.vape.sso.model.UserModel;
 import com.vape.sso.repository.credential.SessionRepository;
-import com.vape.sso.swagger.model.SessionRequest;
-import com.vape.sso.swagger.model.SessionResponse;
+import com.vape.sso.swagger.v1.model.SessionRequest;
+import com.vape.sso.swagger.v1.model.SessionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Service
@@ -38,7 +37,7 @@ public class SessionService {
 
     private SessionModel activate(SessionRequest request) {
         SessionModel existing = sessionRepository.findSessionModelByUser(request.getClientId());
-        UserModel user = userService.getUser(request.getClientId());
+        UserModel user = userService.getUserById(request.getClientId());
         JwtPayloadModel payload = generatePayload(user, request);
         return existing == null
                 ? sessionRepository.save(generateNewSession(request, payload))

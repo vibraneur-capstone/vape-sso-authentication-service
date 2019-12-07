@@ -10,10 +10,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class JwtService {

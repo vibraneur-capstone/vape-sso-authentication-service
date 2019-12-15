@@ -10,7 +10,7 @@ import java.time.LocalTime;
 @Builder
 @Setter(AccessLevel.NONE)
 @Document(collection="liveSessions")
-public class SessionModel {
+public class TokenModel {
     @Id
     private String sessionId;
     private String jwt;

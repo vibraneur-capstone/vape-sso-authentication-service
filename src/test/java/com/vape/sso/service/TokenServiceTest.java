@@ -1,11 +1,11 @@
 package com.vape.sso.service;
 
 import com.vape.sso.model.JwtPayloadModel;
-import com.vape.sso.model.SessionModel;
+import com.vape.sso.model.TokenModel;
 import com.vape.sso.model.UserModel;
 import com.vape.sso.repository.credential.SessionRepository;
 import com.vape.sso.swagger.v1.model.SessionRequest;
-import com.vape.sso.swagger.v1.model.SessionResponse;
+import com.vape.sso.swagger.v1.model.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,10 +21,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 
-public class SessionServiceTest {
+public class TokenServiceTest {
 
     @InjectMocks
-    private SessionService serviceToTest;
+    private TokenService serviceToTest;
 
     @Mock
     private SessionRepository sessionRepository;
@@ -52,7 +52,7 @@ public class SessionServiceTest {
         when(userService.validateSessionRequest(mockRequest)).thenReturn(false);
 
         // Act
-        SessionResponse actual = serviceToTest.activateNewSession(mockRequest);
+        Token actual = serviceToTest.activateNewSession(mockRequest);
 
         // Assert
         assertAll("Ensure the user model return correctly",
@@ -78,11 +78,11 @@ public class SessionServiceTest {
 
         when(userService.validateSessionRequest(mockRequest)).thenReturn(true);
         when(sessionRepository.findSessionModelByUser(mockRequest.getClientId())).thenReturn(null);
-        when(sessionRepository.save(any(SessionModel.class))).thenReturn(SessionModel.builder().sessionId("test").jwt("jwt").build());
+        when(sessionRepository.save(any(TokenModel.class))).thenReturn(TokenModel.builder().sessionId("test").jwt("jwt").build());
         when(userService.getUserById(mockRequest.getClientId())).thenReturn(constructMockUser());
         when(jwtService.createJWT(any(JwtPayloadModel.class), eq("NEW"))).thenReturn(mockJWT);
         // Act
-        SessionResponse actualResponse = serviceToTest.activateNewSession(mockRequest);
+        Token actualResponse = serviceToTest.activateNewSession(mockRequest);
 
         // Assert
         verify(jwtService, times(1)).createJWT(any(JwtPayloadModel.class), eq("NEW"));
@@ -102,15 +102,15 @@ public class SessionServiceTest {
                 .clientId(mockClientId)
                 .clientSecret(mockClientSecret);
 
-        SessionModel mockSession = SessionModel.builder().sessionId("test").jwt("jwt").build();
+        TokenModel mockSession = TokenModel.builder().sessionId("test").jwt("jwt").build();
 
         when(userService.validateSessionRequest(mockRequest)).thenReturn(true);
         when(sessionRepository.findSessionModelByUser(mockRequest.getClientId())).thenReturn(mockSession);
-        when(sessionRepository.save(any(SessionModel.class))).thenReturn(mockSession);
+        when(sessionRepository.save(any(TokenModel.class))).thenReturn(mockSession);
         when(userService.getUserById(mockRequest.getClientId())).thenReturn(constructMockUser());
         when(jwtService.createJWT(any(JwtPayloadModel.class), eq("EXTEND"))).thenReturn(mockJWT);
         // Act
-        SessionResponse actualResponse = serviceToTest.activateNewSession(mockRequest);
+        Token actualResponse = serviceToTest.activateNewSession(mockRequest);
 
         // Assert
         verify(jwtService, times(1)).createJWT(any(JwtPayloadModel.class), eq("EXTEND"));

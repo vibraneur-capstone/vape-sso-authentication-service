@@ -4,7 +4,7 @@ import com.vape.sso.model.JwtPayloadModel;
 import com.vape.sso.model.TokenModel;
 import com.vape.sso.model.UserModel;
 import com.vape.sso.repository.credential.SessionRepository;
-import com.vape.sso.swagger.v1.model.SessionRequest;
+import com.vape.sso.swagger.v1.model.TokenRequest;
 import com.vape.sso.swagger.v1.model.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,16 +26,16 @@ public class TokenService {
     /**
      * Activate a new session or update existing one with new jwt token
      * if request is not valid, an empty object is returned
-     * @param request SessionRequest
+     * @param request TokenRequest
      * @return Token
      */
-    public Token activateNewSession(SessionRequest request) {
-        return userService.validateSessionRequest(request)
+    public Token activateNewSession(TokenRequest request) {
+        return userService.validateTokenRequest(request)
                 ? toToken(activate(request))
-                : new Token();
+                : null;
     }
 
-    private TokenModel activate(SessionRequest request) {
+    private TokenModel activate(TokenRequest request) {
         TokenModel existing = sessionRepository.findSessionModelByUser(request.getClientId());
         UserModel user = userService.getUserById(request.getClientId());
         JwtPayloadModel payload = generatePayload(user, request);
@@ -47,15 +47,15 @@ public class TokenService {
     /**
      * generate jwt payload content
      * @param user UserModel
-     * @param sessionRequest SessionRequest
+     * @param TokenRequest TokenRequest
      * @return JwtPayloadModel
      */
-    private JwtPayloadModel generatePayload(UserModel user, SessionRequest sessionRequest) {
+    private JwtPayloadModel generatePayload(UserModel user, TokenRequest TokenRequest) {
         return JwtPayloadModel.builder()
                 .fullName(user.getFullName())
                 .user(user.getClientId())
                 .userRoles(user.getUserRole().toString())
-                .userAgent(sessionRequest.getUserAgent())
+                .userAgent(TokenRequest.getUserAgent())
                 .build();
     }
 
@@ -76,12 +76,12 @@ public class TokenService {
     }
 
     /**
-     * Create a new SessionModel from SessionRequest
+     * Create a new SessionModel from TokenRequest
      *
-     * @param request SessionRequest
+     * @param request TokenRequest
      * @return SessionModel
      */
-    private TokenModel generateNewSession(SessionRequest request, JwtPayloadModel payload) {
+    private TokenModel generateNewSession(TokenRequest request, JwtPayloadModel payload) {
         return TokenModel.builder()
                 .userAgent(request.getUserAgent())
                 .createdTime(LocalTime.now())
@@ -98,8 +98,8 @@ public class TokenService {
      */
     private Token toToken(TokenModel session) {
         Token response = new Token();
-        response.setSessionId(session.getSessionId());
-        response.setSecrete(session.getJwt());
+        response.id(session.getSessionId());
+        response.jwt(session.getJwt());
         return response;
     }
 }

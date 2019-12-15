@@ -2,7 +2,7 @@ package com.vape.sso.service;
 
 import com.vape.sso.model.UserModel;
 import com.vape.sso.repository.credential.UserRepository;
-import com.vape.sso.swagger.v1.model.SessionRequest;
+import com.vape.sso.swagger.v1.model.TokenRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,10 +27,10 @@ public class UserService {
 
     /**
      * Validate session request by comparing user credential
-     * @param request SessionRequest
+     * @param request TokenRequest
      * @return boolean
      */
-    boolean validateSessionRequest(SessionRequest request){
+    boolean validateTokenRequest(TokenRequest request){
         UserModel user = userRepository.findUsersByClientId(request.getClientId());
         return user != null && computeHash(user, request).equals(user.getHashedPwd());
     }
@@ -38,10 +38,10 @@ public class UserService {
     /**
      * compute a hash for a user password
      * @param user userModel
-     * @param request SessionRequest
+     * @param request TokenRequest
      * @return String
      */
-    private String computeHash(UserModel user, SessionRequest request) {
+    private String computeHash(UserModel user, TokenRequest request) {
         String id = DigestUtils.sha256Hex(String.format("%s%s", user.getId(), user.getClientId()));
         String salt = credentialSaltService.getSaltByAssociateId(id);
         return salt == null ? "" : DigestUtils.sha256Hex(String.format("%s%s", salt, request.getClientSecret()));

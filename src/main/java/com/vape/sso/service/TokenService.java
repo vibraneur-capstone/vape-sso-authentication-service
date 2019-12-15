@@ -1,11 +1,14 @@
 package com.vape.sso.service;
 
+import com.vape.sso.mapper.TokenTransformer;
 import com.vape.sso.model.JwtPayloadModel;
 import com.vape.sso.model.TokenModel;
 import com.vape.sso.model.UserModel;
-import com.vape.sso.repository.credential.SessionRepository;
+import com.vape.sso.repository.credential.TokenRepository;
 import com.vape.sso.swagger.v1.model.TokenRequest;
 import com.vape.sso.swagger.v1.model.Token;
+import com.vape.sso.swagger.v1.model.TokenState;
+import com.vape.sso.swagger.v1.model.TokenStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +18,25 @@ import java.time.LocalTime;
 public class TokenService {
 
     @Autowired
-    private SessionRepository sessionRepository;
+    private TokenRepository tokenRepository;
 
     @Autowired
     private UserService userService;
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private TokenTransformer tokenTransformer;
+
+    public TokenState getTokenState(String tokenId, String token) {
+        TokenModel tokenModel = tokenRepository.findTokenModelById(tokenId);
+        TokenState tokenState = new TokenState().status(TokenStatus.INVALID);
+        if (tokenModel != null && token.equals(tokenModel.getJwt()) && jwtService.isValidJWT(token)) {
+            tokenState.setStatus(TokenStatus.ACTIVE);
+        }
+        return tokenState;
+    }
 
     /**
      * Activate a new session or update existing one with new jwt token
@@ -31,32 +46,17 @@ public class TokenService {
      */
     public Token activateNewSession(TokenRequest request) {
         return userService.validateTokenRequest(request)
-                ? toToken(activate(request))
+                ? tokenTransformer.toToken(activate(request))
                 : null;
     }
 
     private TokenModel activate(TokenRequest request) {
-        TokenModel existing = sessionRepository.findSessionModelByUser(request.getClientId());
+        TokenModel existing = tokenRepository.findTokenModelByUser(request.getClientId());
         UserModel user = userService.getUserById(request.getClientId());
-        JwtPayloadModel payload = generatePayload(user, request);
+        JwtPayloadModel payload = jwtService.generatePayload(user, request);
         return existing == null
-                ? sessionRepository.save(generateNewSession(request, payload))
-                : sessionRepository.save(updateExistingSession(existing, payload));
-    }
-
-    /**
-     * generate jwt payload content
-     * @param user UserModel
-     * @param TokenRequest TokenRequest
-     * @return JwtPayloadModel
-     */
-    private JwtPayloadModel generatePayload(UserModel user, TokenRequest TokenRequest) {
-        return JwtPayloadModel.builder()
-                .fullName(user.getFullName())
-                .user(user.getClientId())
-                .userRoles(user.getUserRole().toString())
-                .userAgent(TokenRequest.getUserAgent())
-                .build();
+                ? tokenRepository.save(generateNewSession(request, payload))
+                : tokenRepository.save(updateExistingSession(existing, payload));
     }
 
     /**
@@ -67,7 +67,7 @@ public class TokenService {
      */
     private TokenModel updateExistingSession(TokenModel session, JwtPayloadModel payload) {
         return TokenModel.builder()
-                .tokenId(session.getTokenId())
+                .id(session.getId())
                 .userAgent(session.getUserAgent())
                 .createdTime(session.getCreatedTime())
                 .jwt(jwtService.createJWT(payload, "EXTEND"))
@@ -88,18 +88,5 @@ public class TokenService {
                 .jwt(jwtService.createJWT(payload, "NEW"))
                 .user(request.getClientId())
                 .build();
-    }
-
-    /**
-     * mapper method for mapping SessionModel to Token
-     *
-     * @param session SessionModel
-     * @return Token
-     */
-    private Token toToken(TokenModel session) {
-        Token response = new Token();
-        response.id(session.getTokenId());
-        response.jwt(session.getJwt());
-        return response;
     }
 }

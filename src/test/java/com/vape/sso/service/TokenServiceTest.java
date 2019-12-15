@@ -1,11 +1,14 @@
 package com.vape.sso.service;
 
+import com.vape.sso.mapper.TokenTransformer;
 import com.vape.sso.model.JwtPayloadModel;
 import com.vape.sso.model.TokenModel;
 import com.vape.sso.model.UserModel;
-import com.vape.sso.repository.credential.SessionRepository;
+import com.vape.sso.repository.credential.TokenRepository;
 import com.vape.sso.swagger.v1.model.TokenRequest;
 import com.vape.sso.swagger.v1.model.Token;
+import com.vape.sso.swagger.v1.model.TokenState;
+import com.vape.sso.swagger.v1.model.TokenStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +30,7 @@ public class TokenServiceTest {
     private TokenService serviceToTest;
 
     @Mock
-    private SessionRepository sessionRepository;
+    private TokenRepository tokenRepository;
 
     @Mock
     private UserService userService;
@@ -35,9 +38,96 @@ public class TokenServiceTest {
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private TokenTransformer tokenTransformer;
+
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    @DisplayName("should return TokenState with status of ACTIVE")
+    void test_get_token_state_active() {
+        // Arrange
+        String mockJwt = "test";
+        String mockJwtId = "test id";
+        TokenModel mockTokenModel = TokenModel.builder().jwt(mockJwt).id(mockJwtId).build();
+        when(tokenRepository.findTokenModelById(any())).thenReturn(mockTokenModel);
+        when(jwtService.isValidJWT(mockJwt)).thenReturn(true);
+
+        // Act
+        TokenState actualTokenState = serviceToTest.getTokenState(mockJwtId, mockJwt);
+
+        // Assert
+        assertAll("ensure ACTIVE TokenState",
+                () -> assertEquals(TokenStatus.ACTIVE, actualTokenState.getStatus())
+                );
+        verify(tokenRepository, times(1)).findTokenModelById(mockJwtId);
+        verify(jwtService, times(1)).isValidJWT(mockJwt);
+    }
+
+    @Test
+    @DisplayName("should return TokenState with status of INVALID for invalid token")
+    void test_get_token_state_invalid_token() {
+        // Arrange
+        String mockJwt = "test";
+        String mockJwtId = "test id";
+        TokenModel mockTokenModel = TokenModel.builder().jwt(mockJwt).id(mockJwtId).build();
+        when(tokenRepository.findTokenModelById(any())).thenReturn(mockTokenModel);
+        when(jwtService.isValidJWT(mockJwt)).thenReturn(false);
+
+        // Act
+        TokenState actualTokenState = serviceToTest.getTokenState(mockJwtId, mockJwt);
+
+        // Assert
+        assertAll("ensure INVALID TokenState",
+                () -> assertEquals(TokenStatus.INVALID, actualTokenState.getStatus())
+        );
+        verify(tokenRepository, times(1)).findTokenModelById(mockJwtId);
+        verify(jwtService, times(1)).isValidJWT(mockJwt);
+    }
+
+    @Test
+    @DisplayName("should return TokenState with status of INVALID for not found token in mongo")
+    void test_get_token_state_token_not_found() {
+        // Arrange
+        String mockJwt = "test";
+        String mockJwtId = "test id";
+        when(tokenRepository.findTokenModelById(any())).thenReturn(null);
+        when(jwtService.isValidJWT(mockJwt)).thenReturn(true);
+
+        // Act
+        TokenState actualTokenState = serviceToTest.getTokenState(mockJwtId, mockJwt);
+
+        // Assert
+        assertAll("ensure INVALID TokenState",
+                () -> assertEquals(TokenStatus.INVALID, actualTokenState.getStatus())
+        );
+        verify(tokenRepository, times(1)).findTokenModelById(mockJwtId);
+        verify(jwtService, times(0)).isValidJWT(mockJwt);
+    }
+
+    @Test
+    @DisplayName("should return TokenState with status of INVALID for token no match")
+    void test_get_token_state_token_not_matched() {
+        // Arrange
+        String mockJwt = "test";
+        String mockJwtId = "test id";
+        TokenModel mockTokenModel = TokenModel.builder().jwt("no match").id(mockJwtId).build();
+        when(tokenRepository.findTokenModelById(any())).thenReturn(mockTokenModel);
+        when(jwtService.isValidJWT(mockJwt)).thenReturn(true);
+
+        // Act
+        TokenState actualTokenState = serviceToTest.getTokenState(mockJwtId, mockJwt);
+
+        // Assert
+        assertAll("ensure INVALID TokenState",
+                () -> assertEquals(TokenStatus.INVALID, actualTokenState.getStatus())
+        );
+        verify(tokenRepository, times(1)).findTokenModelById(mockJwtId);
+        verify(jwtService, times(0)).isValidJWT(mockJwt);
     }
 
     @Test
@@ -58,8 +148,8 @@ public class TokenServiceTest {
         assertAll("Ensure the user model return correctly",
                 () -> assertNull(actual));
         verify(jwtService, times(0)).createJWT(any(), any());
-        verify(sessionRepository, times(0)).findSessionModelByUser(any());
-        verify(sessionRepository, times(0)).save(any());
+        verify(tokenRepository, times(0)).findTokenModelByUser(any());
+        verify(tokenRepository, times(0)).save(any());
         verify(userService, times(0)).getUserById(any());
         verify(jwtService, times(0)).createJWT(any(), any());
     }
@@ -74,12 +164,17 @@ public class TokenServiceTest {
         TokenRequest mockRequest = new TokenRequest()
                 .clientId(mockClientId)
                 .clientSecret(mockClientSecret);
+        TokenModel mockTokenModel = TokenModel.builder().id("test").jwt("jwt").build();
+        Token mockToken = new Token().id("test").jwt("jwt");
 
         when(userService.validateTokenRequest(mockRequest)).thenReturn(true);
-        when(sessionRepository.findSessionModelByUser(mockRequest.getClientId())).thenReturn(null);
-        when(sessionRepository.save(any(TokenModel.class))).thenReturn(TokenModel.builder().tokenId("test").jwt("jwt").build());
+        when(tokenRepository.findTokenModelByUser(mockRequest.getClientId())).thenReturn(null);
+        when(tokenRepository.save(any(TokenModel.class))).thenReturn(mockTokenModel);
         when(userService.getUserById(mockRequest.getClientId())).thenReturn(constructMockUser());
         when(jwtService.createJWT(any(JwtPayloadModel.class), eq("NEW"))).thenReturn(mockJWT);
+        when(jwtService.generatePayload(any(), any())).thenReturn(JwtPayloadModel.builder().build());
+        when(tokenTransformer.toToken(mockTokenModel)).thenReturn(mockToken);
+
         // Act
         Token actualResponse = serviceToTest.activateNewSession(mockRequest);
 
@@ -101,13 +196,16 @@ public class TokenServiceTest {
                 .clientId(mockClientId)
                 .clientSecret(mockClientSecret);
 
-        TokenModel mockSession = TokenModel.builder().tokenId("test").jwt("jwt").build();
+        TokenModel mockTokenModel = TokenModel.builder().id("test").jwt("jwt").build();
+        Token mockToken = new Token().id("test").jwt("jwt");
 
         when(userService.validateTokenRequest(mockRequest)).thenReturn(true);
-        when(sessionRepository.findSessionModelByUser(mockRequest.getClientId())).thenReturn(mockSession);
-        when(sessionRepository.save(any(TokenModel.class))).thenReturn(mockSession);
+        when(tokenRepository.findTokenModelByUser(mockRequest.getClientId())).thenReturn(mockTokenModel);
+        when(tokenRepository.save(any(TokenModel.class))).thenReturn(mockTokenModel);
         when(userService.getUserById(mockRequest.getClientId())).thenReturn(constructMockUser());
         when(jwtService.createJWT(any(JwtPayloadModel.class), eq("EXTEND"))).thenReturn(mockJWT);
+        when(jwtService.generatePayload(any(), any())).thenReturn(JwtPayloadModel.builder().build());
+        when(tokenTransformer.toToken(mockTokenModel)).thenReturn(mockToken);
         // Act
         Token actualResponse = serviceToTest.activateNewSession(mockRequest);
 

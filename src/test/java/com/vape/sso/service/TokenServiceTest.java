@@ -77,7 +77,7 @@ public class TokenServiceTest {
 
         when(userService.validateTokenRequest(mockRequest)).thenReturn(true);
         when(sessionRepository.findSessionModelByUser(mockRequest.getClientId())).thenReturn(null);
-        when(sessionRepository.save(any(TokenModel.class))).thenReturn(TokenModel.builder().sessionId("test").jwt("jwt").build());
+        when(sessionRepository.save(any(TokenModel.class))).thenReturn(TokenModel.builder().tokenId("test").jwt("jwt").build());
         when(userService.getUserById(mockRequest.getClientId())).thenReturn(constructMockUser());
         when(jwtService.createJWT(any(JwtPayloadModel.class), eq("NEW"))).thenReturn(mockJWT);
         // Act
@@ -101,7 +101,7 @@ public class TokenServiceTest {
                 .clientId(mockClientId)
                 .clientSecret(mockClientSecret);
 
-        TokenModel mockSession = TokenModel.builder().sessionId("test").jwt("jwt").build();
+        TokenModel mockSession = TokenModel.builder().tokenId("test").jwt("jwt").build();
 
         when(userService.validateTokenRequest(mockRequest)).thenReturn(true);
         when(sessionRepository.findSessionModelByUser(mockRequest.getClientId())).thenReturn(mockSession);

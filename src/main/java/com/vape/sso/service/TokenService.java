@@ -67,7 +67,7 @@ public class TokenService {
      */
     private TokenModel updateExistingSession(TokenModel session, JwtPayloadModel payload) {
         return TokenModel.builder()
-                .sessionId(session.getSessionId())
+                .tokenId(session.getTokenId())
                 .userAgent(session.getUserAgent())
                 .createdTime(session.getCreatedTime())
                 .jwt(jwtService.createJWT(payload, "EXTEND"))
@@ -98,7 +98,7 @@ public class TokenService {
      */
     private Token toToken(TokenModel session) {
         Token response = new Token();
-        response.id(session.getSessionId());
+        response.id(session.getTokenId());
         response.jwt(session.getJwt());
         return response;
     }

@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @Document(collection="liveSessions")
 public class TokenModel {
     @Id
-    private String sessionId;
+    private String tokenId;
     private String jwt;
     private String user;
     private String userAgent;

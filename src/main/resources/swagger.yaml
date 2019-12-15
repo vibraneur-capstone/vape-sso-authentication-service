@@ -20,7 +20,7 @@ paths:
 
       parameters:
         - in: query
-          name: sessionId
+          name: tokenId
           required: true
           type: string
           description: The id of session to check
@@ -71,7 +71,7 @@ paths:
           name: Credential
           required: true
           schema:
-            $ref: '#/definitions/SessionRequest'
+            $ref: '#/definitions/TokenRequest'
       responses:
         '200':
           description: Successful operation
@@ -98,11 +98,11 @@ definitions:
   Token:
     type: object
     properties:
-      sessionId:
+      id:
         type: string
-      secrete:
+      jwt:
         type: string
-  SessionRequest:
+  TokenRequest:
     type: object
     properties:
       client-id:

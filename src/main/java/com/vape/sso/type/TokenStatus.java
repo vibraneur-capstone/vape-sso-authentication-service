@@ -1,6 +1,6 @@
 package com.vape.sso.type;
 
-public enum SessionStatus {
+public enum TokenStatus {
     EXPIRED,
     INVALID,
     ACTIVE

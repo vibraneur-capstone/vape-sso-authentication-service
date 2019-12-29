@@ -3,7 +3,7 @@ package com.vape.sso.service;
 
 import com.vape.sso.model.UserModel;
 import com.vape.sso.repository.credential.UserRepository;
-import com.vape.sso.swagger.v1.model.SessionRequest;
+import com.vape.sso.swagger.v1.model.TokenRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -72,7 +72,7 @@ public class UserServiceTest {
                 .hashedPwd(hashPwd)
                 .build();
 
-        SessionRequest mockRequest = new SessionRequest()
+        TokenRequest mockRequest = new TokenRequest()
                 .clientId(mockClientId)
                 .clientSecret(mockClientSecret);
 
@@ -80,7 +80,7 @@ public class UserServiceTest {
         when(credentialSaltService.getSaltByAssociateId(associateId)).thenReturn(mockSalt);
 
         // Act
-        boolean actual = serviceToTest.validateSessionRequest(mockRequest);
+        boolean actual = serviceToTest.validateTokenRequest(mockRequest);
 
         // Assert
         assertAll("Ensure true is returned",
@@ -91,7 +91,7 @@ public class UserServiceTest {
     @DisplayName("should return false for user not found")
     void test_validate_user_false_for_user_not_found() {
         // Arrange
-        SessionRequest mockRequest = new SessionRequest()
+        TokenRequest mockRequest = new TokenRequest()
                 .clientId("mockClientId")
                 .clientSecret("mockClientSecret");
 
@@ -100,7 +100,7 @@ public class UserServiceTest {
         // Act & Assert
 
         assertAll("Ensure false is returned",
-                () -> assertFalse(serviceToTest.validateSessionRequest(mockRequest)));
+                () -> assertFalse(serviceToTest.validateTokenRequest(mockRequest)));
     }
 
 }

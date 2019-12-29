@@ -1,10 +1,10 @@
 package com.vape.sso.repository.credential;
 
-import com.vape.sso.model.SessionModel;
+import com.vape.sso.model.TokenModel;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-public interface SessionRepository extends MongoRepository<SessionModel, String> {
+public interface SessionRepository extends MongoRepository<TokenModel, String> {
     @Query("{ 'user': ?0 }")
-    SessionModel findSessionModelByUser(String userName);
+    TokenModel findSessionModelByUser(String userName);
 }

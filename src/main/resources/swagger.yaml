@@ -9,7 +9,7 @@ schemes:
   - http
   - https
 paths:
-  '/session/client':
+  '/token/client':
     get:
       tags:
         - Check if session is active
@@ -20,7 +20,7 @@ paths:
 
       parameters:
         - in: query
-          name: sessionId
+          name: tokenId
           required: true
           type: string
           description: The id of session to check
@@ -34,7 +34,7 @@ paths:
         '200':
           description: Successful operation
           schema:
-            $ref: '#/definitions/SessionState'
+            $ref: '#/definitions/TokenState'
           headers:
             Access-Control-Allow-Origin:
               type: string
@@ -51,7 +51,7 @@ paths:
           schema:
             $ref: '#/definitions/Exception'
 
-  '/session/client/{clientId}':
+  '/token/client/{clientId}':
     post:
       tags:
         - Activate new session
@@ -71,12 +71,12 @@ paths:
           name: Credential
           required: true
           schema:
-            $ref: '#/definitions/SessionRequest'
+            $ref: '#/definitions/TokenRequest'
       responses:
         '200':
           description: Successful operation
           schema:
-            $ref: '#/definitions/SessionResponse'
+            $ref: '#/definitions/Token'
           headers:
             Access-Control-Allow-Origin:
               type: string
@@ -95,14 +95,14 @@ paths:
             $ref: '#/definitions/Exception'
 
 definitions:
-  SessionResponse:
+  Token:
     type: object
     properties:
-      sessionId:
+      id:
         type: string
-      secrete:
+      jwt:
         type: string
-  SessionRequest:
+  TokenRequest:
     type: object
     properties:
       client-id:
@@ -111,12 +111,12 @@ definitions:
         type: string
       user-agent:
         type: string
-  SessionState:
+  TokenState:
     type: object
     properties:
       status:
-        $ref: '#/definitions/SessionStatus'
-  SessionStatus:
+        $ref: '#/definitions/TokenStatus'
+  TokenStatus:
     type: string
     enum:
       - EXPIRED

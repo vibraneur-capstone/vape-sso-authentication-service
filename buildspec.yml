@@ -16,9 +16,11 @@ phases:
     commands:
       - echo Build completed on `date`
       - timestamp=$(date +%Y-%m-%d-%H-%M-%S)
+      - cp ./target/sso-*.jar .
+      - cp src/main/resources/swagger.yaml .
 
 artifacts:
   files:
-    - target/sso-*.jar
-    - src/main/resources/swagger.yaml
+    - sso-*.jar
+    - swagger.yaml
   name: sso-authentication-service-dist-$timestamp

@@ -19,6 +19,6 @@ phases:
 
 artifacts:
   files:
-    - './target/sso-*.jar'
-    - './src/main/resources/swagger.yaml'
+    - target/sso-*.jar
+    - src/main/resources/swagger.yaml
   name: sso-authentication-service-dist-$timestamp

@@ -4,6 +4,7 @@ import com.vape.sso.service.TokenService;
 import com.vape.sso.swagger.v1.model.Token;
 import com.vape.sso.swagger.v1.model.TokenRequest;
 import com.vape.sso.swagger.v1.model.TokenState;
+import com.vape.sso.swagger.v1.model.TokenStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,18 +29,84 @@ public class TokenControllerTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    // TODO update this test
     @Test
-    @DisplayName("should return null")
+    @DisplayName("should return 200 and valid status for token")
     void test_token_validation_success() {
         // Arrange
+        String mockTokenId = "test id";
+        String mockJwtToken = "jwt token";
+        when(tokenService.getTokenState(eq(mockTokenId), eq(mockJwtToken))).thenReturn(new TokenState().status(TokenStatus.ACTIVE));
 
         // Act
-        ResponseEntity<TokenState> actualResponse = controllerToTest.getSession("test id", "token");
+        ResponseEntity<TokenState> actualResponse = controllerToTest.getSession(mockTokenId, mockJwtToken);
 
         // Assert
-        assertAll("ensure null",
-                () -> assertNull(actualResponse));
+        assertAll("ensure OK",
+                () -> assertNotNull(actualResponse.getBody()),
+                () -> assertEquals(HttpStatus.OK, actualResponse.getStatusCode()),
+                () -> assertEquals(TokenStatus.ACTIVE, actualResponse.getBody().getStatus()));
+        verify(tokenService, times(1)).getTokenState(mockTokenId, mockJwtToken);
+    }
+
+    @Test
+    @DisplayName("should return 401 if token is invalid")
+    void test_token_validation_invalid() {
+        // Arrange
+        String mockTokenId = "test id";
+        String mockJwtToken = "jwt token";
+        when(tokenService.getTokenState(eq(mockTokenId), eq(mockJwtToken))).thenReturn(new TokenState().status(TokenStatus.INVALID));
+
+        // Act
+        ResponseEntity<TokenState> actualResponse = controllerToTest.getSession(mockTokenId, mockJwtToken);
+
+        // Assert
+        assertAll("ensure UNAUTHORIZED",
+                () -> assertNotNull(actualResponse.getBody()),
+                () -> assertEquals(HttpStatus.UNAUTHORIZED, actualResponse.getStatusCode()),
+                () -> assertEquals(TokenStatus.INVALID, actualResponse.getBody().getStatus()));
+        verify(tokenService, times(1)).getTokenState(mockTokenId, mockJwtToken);
+    }
+
+    @Test
+    @DisplayName("should return 400 if token id is null or empty")
+    void test_token_validation_id_empty_or_null() {
+        // Arrange
+        String mockEmptyTokenId = "";
+        String mockJwtToken = "jwt token";
+
+        // Act
+        ResponseEntity<TokenState> actualResponseEmptyId = controllerToTest.getSession(mockEmptyTokenId, mockJwtToken);
+        ResponseEntity<TokenState> actualResponseNullId = controllerToTest.getSession(null, mockJwtToken);
+
+        // Assert
+        assertAll("ensure BAD REQUEST",
+                () -> assertNull(actualResponseEmptyId.getBody().getStatus()),
+                () -> assertEquals(HttpStatus.BAD_REQUEST, actualResponseEmptyId.getStatusCode()),
+                () -> assertNull(actualResponseNullId.getBody().getStatus()),
+                () -> assertEquals(HttpStatus.BAD_REQUEST, actualResponseNullId.getStatusCode())
+        );
+        verify(tokenService, times(0)).getTokenState(any(), any());
+    }
+
+    @Test
+    @DisplayName("should return 400 if token is null or empty")
+    void test_token_validation_token_empty_or_null() {
+        // Arrange
+        String mockJwtToken = "";
+        String mockTokenId = "jwt token id";
+
+        // Act
+        ResponseEntity<TokenState> actualResponseEmptyToken = controllerToTest.getSession(mockTokenId, mockJwtToken);
+        ResponseEntity<TokenState> actualResponseNullToken = controllerToTest.getSession(mockTokenId, null);
+
+        // Assert
+        assertAll("ensure BAD REQUEST",
+                () -> assertNull(actualResponseEmptyToken.getBody().getStatus()),
+                () -> assertEquals(HttpStatus.BAD_REQUEST, actualResponseEmptyToken.getStatusCode()),
+                () -> assertNull(actualResponseNullToken.getBody().getStatus()),
+                () -> assertEquals(HttpStatus.BAD_REQUEST, actualResponseNullToken.getStatusCode())
+        );
+        verify(tokenService, times(0)).getTokenState(any(), any());
     }
 
     @Test

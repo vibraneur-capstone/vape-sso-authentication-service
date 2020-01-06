@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+  pre_build:
+    commands:
+      - echo Skipping pre build stage
+  build:
+    commands:
+      - echo Building...
+      - echo Build started on `date`
+      - mvn install
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - timestamp=$(date +%Y-%m-%d-%H-%M-%S)
+      - cp ./target/sso-*.jar .
+      - cp src/main/resources/swagger.yaml .
+
+artifacts:
+  files:
+    - sso-*.jar
+    - swagger.yaml
+  name: sso-authentication-service-dist-$timestamp

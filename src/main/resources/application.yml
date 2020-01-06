@@ -15,5 +15,5 @@ com:
       jwt:
         issuer: vibraneur-sso-service
         signature-algorithm: HS256
-        max-age: 1000000
+        max-age: 10000000
         secret-key: CC4BBA2415B838D58193ADE9E492B

@@ -26,4 +26,4 @@ artifacts:
   files:
     - sso-*.jar
     - swagger*.yaml
-  name: sso-authentication-service-dist
+  name: vape-sso-authentication-service
